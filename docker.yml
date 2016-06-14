@@ -1,0 +1,97 @@
+---
+- name: docker
+  hosts: all
+  tasks:
+    - name: install docker dependencies
+      apt:
+        pkg: "{{ item }}"
+        state: latest
+        update_cache: yes
+      with_items:
+        - apt-transport-https
+        - ca-certificates
+
+    - name: import docker repository key
+      apt_key:
+        keyserver: hkp://p80.pool.sks-keyservers.net:80
+        id: 58118E89F3A912897C070ADBF76221572C52609D
+        state: present
+
+    - name: add docker repo
+      apt_repository:
+        repo: 'deb https://apt.dockerproject.org/repo ubuntu-{{ ansible_distribution_release }} main'
+        state: present
+
+    - name: install docker engine
+      apt:
+        pkg: docker-engine
+        state: latest
+        update_cache: yes
+
+    - name: create a docker group
+      group:
+        name: docker
+        state: present
+
+    - name: Add user(s) to docker group
+      user:
+        name: "{{ item }}"
+        group: docker
+        state: present
+      with_items: docker_users
+      when: docker_users is defined
+
+    - name: Install pip, python-dev package with apt
+      apt:
+        pkg: "{{ item }}"
+        state: latest
+        update_cache: yes
+      with_items:
+        - python-dev
+        - python-pip
+
+    - name: install docker-compose
+      pip:
+        name: "{{ item }}"
+        state: latest
+      with_items:
+        - pip
+        - setuptools
+        - docker-py
+        - docker-compose
+      ignore_errors: yes
+
+    - name: Check if /etc/updatedb.conf exists
+      stat:
+        path: /etc/updatedb.conf
+      register: updatedb_conf_exists
+
+    - name: Ensure updatedb does not index /var/lib/docker
+      lineinfile:
+        dest: /etc/updatedb.conf
+        state: present
+        backrefs: yes
+        regexp: '^PRUNEPATHS="(/var/lib/docker )?(.*)"$'
+        line: 'PRUNEPATHS="/var/lib/docker \2"'
+      when: updatedb_conf_exists.stat.exists
+
+    - name: Check if /etc/default/ufw exists
+      stat:
+        path: /etc/default/ufw
+      register: ufw_default_exists
+
+    - name: Change ufw default forward policy from drop to accept
+      lineinfile:
+        dest: /etc/default/ufw
+        regexp: "^DEFAULT_FORWARD_POLICY="
+        line: "DEFAULT_FORWARD_POLICY=\"ACCEPT\""
+      when: ufw_default_exists.stat.exists
+
+  #    - name: Configure Docker
+  #      template:
+  #          src=default_docker.j2
+  #          dest=/etc/default/docker
+  #          mode=0644
+  #          owner=root
+  #          group=root
+  #      notify: restart docker
