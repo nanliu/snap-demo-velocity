@@ -1,0 +1,47 @@
+# Install Snap from repository
+- name: support apt over https
+  apt:
+    name: apt-transport-https
+    state: latest
+- name: add snap repository key
+  apt_key:
+    url: https://packagecloud.io/nanliu/snap/gpgkey
+    state: present
+- name: add snap repository
+  apt_repository:
+    repo: "deb https://packagecloud.io/nanliu/snap/ubuntu/ {{ansible_distribution_release}} main" 
+    state: present
+- name: install snap-telemetry
+  apt:
+    name: snap-telemetry
+    state: latest
+# NOTE: optionally update new version of snapd/snapctl
+- stat: 
+    path: /vagrant/bin/snapd
+  register: snapd_binary
+  become: false
+- name: update snapd binary
+  command: cp /vagrant/bin/snapd /opt/snap/bin/snapd
+  when: snapd_binary.stat.exists
+- stat: 
+    path: /vagrant/bin/snapctl
+  register: snapctl_binary
+  become: false
+- name: update snapctl binary
+  command: cp /vagrant/bin/snapctl /opt/snap/bin/snapctl
+  when: snapctl_binary.stat.exists
+- name: snapd.conf
+  template:
+    dest: /etc/snap/snapd.conf
+    src: snapd.conf.j2
+  notify:
+    - restart snapd
+- ufw:
+    rule: allow
+    port: 6000
+    proto: tcp
+- name: enable snap service
+  service:
+    name: snapd
+    state: started
+    enabled: yes

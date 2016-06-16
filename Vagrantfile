@@ -11,8 +11,15 @@ Vagrant.configure(2) do |config|
   end
 
   number_vms = ENV["SNAP_DEMO_VMS"] || 4
-  systems = ['docker']
+  systems = ['grafana', 'snap']
   systems += (1..Integer(number_vms)).collect{|vm| "snap#{vm}"}
+
+  if Vagrant.has_plugin?("landrush")
+    config.landrush.enabled = true
+    #config.landrush.guest_redirect_dns = false
+  else
+    puts "Please run 'vagrant plugin install landrush'"
+  end
 
   systems.each do |vm|
     config.vm.define vm do |system|
@@ -20,26 +27,16 @@ Vagrant.configure(2) do |config|
 
       system.vm.hostname = vm
 
-      #system.vm.network :private_network, ip: :q
-
-      system.vm.provision :hosts do |host|
-        host.autoconfigure = true
-        host.sync_hosts = true
-        host.exports = {
-          'virtualbox' => [
-            ['@vagrant_private_networks', ['@vagrant_hostnames']],
-          ],
-        }
-      end
-
       system.vm.provision :ansible do |ansible|
+        ansible.limit = "all"
         case vm
-        when 'docker'
+        when 'grafana'
           ansible.playbook = "docker.yml"
         else
-          ansible.playbook = "snap.yml"
+          ansible.playbook = "playbook.yml"
         end
         ansible.sudo = true
+        ansible.verbose = true
       end
 
     end
