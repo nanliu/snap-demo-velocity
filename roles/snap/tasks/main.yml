@@ -40,6 +40,10 @@
     rule: allow
     port: 6000
     proto: tcp
+- ufw:
+    rule: allow
+    port: 8181
+    proto: tcp
 - name: enable snap service
   service:
     name: snapd
