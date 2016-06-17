@@ -30,6 +30,8 @@ Vagrant.configure(2) do |config|
       if vm == 'grafana'
         system.vm.network "forwarded_port", guest: 80, host: 8080
         system.vm.network "forwarded_port", guest: 3000, host: 3000
+        system.vm.network "forwarded_port", guest: 8083, host: 8083
+        system.vm.network "forwarded_port", guest: 8086, host: 8086
       end
 
       system.vm.provision :ansible do |ansible|

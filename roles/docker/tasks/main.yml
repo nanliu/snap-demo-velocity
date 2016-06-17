@@ -84,6 +84,19 @@
     line: "DEFAULT_FORWARD_POLICY=\"ACCEPT\""
   when: ufw_default_exists.stat.exists
 
+- ufw:
+    rule: allow
+    port: 3000
+    proto: tcp
+- ufw:
+    rule: allow
+    port: 8080
+    proto: tcp
+- ufw:
+    rule: allow
+    port: 8086
+    proto: tcp
+
 #- name: Configure Docker
 #  template:
 #      src=default_docker.j2
