@@ -10,13 +10,13 @@ Vagrant.configure(2) do |config|
     vm.linked_clone = true
   end
 
-  number_vms = ENV["SNAP_DEMO_VMS"] || 4
-  systems = ['grafana', 'snap']
+  number_vms = ENV["SNAP_DEMO_VMS"] || 1
+  systems = ['grafana']
   systems += (1..Integer(number_vms)).collect{|vm| "snap#{vm}"}
 
   if Vagrant.has_plugin?("landrush")
     config.landrush.enabled = true
-    #config.landrush.guest_redirect_dns = false
+    config.landrush.guest_redirect_dns = false
   else
     puts "Please run 'vagrant plugin install landrush'"
   end
@@ -27,17 +27,17 @@ Vagrant.configure(2) do |config|
 
       system.vm.hostname = vm
 
+      if vm == 'grafana'
+        system.vm.network "forwarded_port", guest: 80, host: 8080
+        system.vm.network "forwarded_port", guest: 3000, host: 3000
+      end
+
       system.vm.provision :ansible do |ansible|
         ansible.limit = "all"
-        case vm
-        when 'grafana'
-          ansible.playbook = "docker.yml"
-        else
-          ansible.playbook = "playbook.yml"
-        end
+        ansible.playbook = "playbook.yml"
         ansible.sudo = true
-        ansible.verbose = true
-      end
+        ansible.verbose = true if ENV['ANSIBLE_VERBOSE']
+      end if vm == "snap#{number_vms}"
 
     end
   end

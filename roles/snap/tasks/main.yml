@@ -1,20 +1,20 @@
+# NOTE: disable repos so we have less internet dependency
 # Install Snap from repository
-- name: support apt over https
-  apt:
-    name: apt-transport-https
-    state: latest
-- name: add snap repository key
-  apt_key:
-    url: https://packagecloud.io/nanliu/snap/gpgkey
-    state: present
-- name: add snap repository
-  apt_repository:
-    repo: "deb https://packagecloud.io/nanliu/snap/ubuntu/ {{ansible_distribution_release}} main" 
-    state: present
+#- name: support apt over https
+#  apt:
+#    name: apt-transport-https
+#    state: latest
+#- name: add snap repository key
+#  apt_key:
+#    url: https://packagecloud.io/nanliu/snap/gpgkey
+#    state: present
+#- name: add snap repository
+#  apt_repository:
+#    repo: "deb https://packagecloud.io/nanliu/snap/ubuntu/ {{ansible_distribution_release}} main"
+#    state: present
 - name: install snap-telemetry
   apt:
-    name: snap-telemetry
-    state: latest
+    deb: /vagrant/pkg/snap-telemetry_0.14.0-1xenial_amd64.deb
 # NOTE: optionally update new version of snapd/snapctl
 - stat: 
     path: /vagrant/bin/snapd
