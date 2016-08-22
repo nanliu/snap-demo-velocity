@@ -14,7 +14,7 @@
 #    state: present
 - name: install snap-telemetry
   apt:
-    deb: /vagrant/pkg/snap-telemetry_0.14.0-1xenial_amd64.deb
+    deb: /vagrant/pkg/snap-telemetry_0.15.0-1xenial_amd64.deb
 # NOTE: optionally update new version of snapd/snapctl
 - stat: 
     path: /vagrant/bin/snapd
