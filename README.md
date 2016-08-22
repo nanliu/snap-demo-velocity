@@ -15,7 +15,6 @@ By default the system uses the snap package in the {repo}/pkg directory. The ubu
 
 ```
 $ curl -sfL https://packagecloud.io/intelsdi-x/snap/packages/ubuntu/xenial/snap-telemetry_0.15.0-1xenial_amd64.deb/download -o pkg/snap-telemetry_0.15.0-1xenial_amd64.deb
-
 ```
 
 Optional: if you want a latest snapd/snapctl place the files in the {repo}/bin directory
@@ -30,6 +29,13 @@ Download and extract snap plugins into {repo}/plugins directory.
 ```
 $ cd plugins
 $ curl -sfLO https://github.com/intelsdi-x/snap/releases/download/v0.15.0-beta/snap-plugins-v0.15.0-beta-linux-amd64.tar.gz
+$ tar xvf snap-plugins-v0.15.0-beta-linux-amd64.tar.gz
+x snap-v0.15.0-beta/
+x snap-v0.15.0-beta/plugin/
+x snap-v0.15.0-beta/plugin/snap-plugin-collector-apache
+x snap-v0.15.0-beta/plugin/snap-plugin-collector-ceph
+x snap-v0.15.0-beta/plugin/snap-plugin-collector-cinder
+x snap-v0.15.0-beta/plugin/snap-plugin-collector-cpu
 ```
 
 ### Vagrant VMs
@@ -43,7 +49,7 @@ $ vagrant up
 ```
 
 To use multiple snap VMs:
-```
+```bash
 $ export SNAP_DEMO_VMS=5
 $ vagrant status
 Current machine states:
